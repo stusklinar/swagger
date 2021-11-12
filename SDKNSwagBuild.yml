@@ -36,16 +36,3 @@ steps:
     command: custom
     custom: pack
     arguments: '${{parameters.projectPath}}  -p:PackageVersion=${{parameters.versionMajor}}.${{parameters.versionMinor}}.${{parameters.versionPatch}}${{parameters.versionSuffix}} --output  $(Build.ArtifactStagingDirectory)'
-
-
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet push external'
-  inputs:
-    command: push
-    publishVstsFeed: 'e1a5976c-c650-44c0-b22d-9381a3ba10bf'
-  
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet push internal'
-  inputs:
-    command: push
-    publishVstsFeed: 'cfc27a80-26d5-49fb-bd05-368b81520bbe'
