@@ -1,0 +1,37 @@
+parameters:
+  azureSubscription: ''
+  dllName: '' #PDR.Apollo.Snomed.Api.dll
+  SwashbuckleVersion: '6.2.1'
+  version: 'v1'
+
+steps:
+    - task: DotNetCoreCLI@2
+      displayName: tool install manifest
+      inputs:
+        command: custom
+        custom: new
+        arguments: tool-manifest
+        workingDirectory: $(Build.BinariesDirectory)
+
+    - task: DotNetCoreCLI@2
+      displayName: tool install
+      inputs:
+        command: custom
+        custom: tool
+        arguments: install --version ${{parameters.SwashbuckleVersion}} Swashbuckle.AspNetCore.Cli
+        workingDirectory: $(Build.BinariesDirectory)        
+
+    - task: AzureCLI@2
+      displayName: Generate Swagger ${{parameters.version}}
+      inputs:
+        azureSubscription: ${{parameters.azureSubscription}}
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+            dotnet swagger tofile --output ${{parameters.version}}.json ${{parameters.dllName}} ${{parameters.version}}
+        workingDirectory: $(Build.BinariesDirectory)
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Swagger Drop'
+      inputs:
+        PathtoPublish: '$(Build.BinariesDirectory)/${{parameters.version}}.json'
